@@ -3,7 +3,7 @@ backend:
   branch: main # или master, смотря как называется ваша главная ветка
 
 media_folder: "public/uploads"
-public_folder: "/public/uploads"
+public_folder: "public/uploads"
 
 collections:
   - name: "rooms"
