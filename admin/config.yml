@@ -1,0 +1,18 @@
+backend:
+  name: github
+  repo: chimgandacha/qimiz
+  branch: main
+
+media_folder: "images"
+public_folder: "images"
+
+collections:
+  - name: "pages"
+    label: "Страницы"
+    files:
+      - file: "index.html"
+        label: "Главная страница"
+        name: "index"
+        fields:
+          - { label: "Заголовок", name: "title", widget: "string" }
+          - { label: "Цена комнат", name: "price", widget: "string" }
