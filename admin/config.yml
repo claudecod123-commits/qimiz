@@ -3,16 +3,21 @@ backend:
   branch: main # или master, смотря как называется ваша главная ветка
 
 media_folder: "public/uploads"
-public_folder: "/uploads"
+public_folder: "/public/uploads"
 
 collections:
   - name: "rooms"
     label: "Номера и цены"
-    folder: "content/rooms"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "Название номера", name: "title", widget: "string" }
-      - { label: "Фотография", name: "image", widget: "image" }
-      - { label: "Описание", name: "description", widget: "text" }
-      - { label: "Цена (текст)", name: "price", widget: "string" }
+    files:
+      - name: "room-list"
+        label: "Список номеров"
+        file: "content/rooms.yml"
+        fields:
+          - label: "Номера"
+            name: "rooms"
+            widget: "list"
+            fields:
+              - { label: "Название номера", name: "title", widget: "string" }
+              - { label: "Фотография", name: "image", widget: "image" }
+              - { label: "Описание", name: "description", widget: "text" }
+              - { label: "Цена (текст)", name: "price", widget: "string" }

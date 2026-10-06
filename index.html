@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>QIMIZ CHIMGAN — гостевой дом в горах</title>
 <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/js-yaml/4.1.0/js-yaml.min.js"></script>
 <style>
   * { margin:0; padding:0; box-sizing:border-box; }
   body { font-family:'Segoe UI', Arial, sans-serif; color:#2b2b2b; background:#fafaf7; }
@@ -120,49 +120,41 @@
 
   async function loadRooms() {
     const container = document.getElementById('room-container');
-    
-    // Указываем точные имена файлов из папки content/rooms/ (без расширения)
-    const roomFiles = ['номер1', 'номер2', 'family', 'full-house', 'standard']; 
 
-    for (const fileName of roomFiles) {
-      try {
-        // Пробуем сначала загрузить .md файл, если нет — .yml
-        let response = await fetch(/content/rooms/${fileName}.md);
-        if (!response.ok) {
-          response = await fetch(/content/rooms/${fileName}.yml);
-        }
-
-        if (response.ok) {
-          let text = await response.text();
-          let data = {};
-
-          // Если файл .md, парсим Frontmatter (текст между ---)
-          if (text.startsWith('---')) {
-            const parts = text.split('---');
-            if (parts.length >= 3) {
-              data = jsyaml.load(parts[1]);
-            }
-          } else {
-            data = jsyaml.load(text);
-          }
-
-          if (data && data.title) {
-            const roomElement = document.createElement('div');
-            roomElement.className = 'room';
-            roomElement.innerHTML = 
-              <img src="${data.image || ''}" alt="${data.title}">
-              <div class="room-body">
-                <h3>${data.title}</h3>
-                <p>${data.description || ''}</p>
-                <div class="price">${data.price || ''}</div>
-              </div>
-            ;
-            container.appendChild(roomElement);
-          }
-        }
-      } catch (e) {
-        console.error("Ошибка загрузки номера:", e);
+    try {
+      const response = await fetch('/content/rooms.yml');
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
       }
+
+      const rooms = jsyaml.load(await response.text())?.rooms ?? [];
+      for (const room of rooms) {
+        const roomElement = document.createElement('div');
+        roomElement.className = 'room';
+
+        const image = document.createElement('img');
+        image.src = room.image || '';
+        image.alt = room.title || '';
+
+        const body = document.createElement('div');
+        body.className = 'room-body';
+
+        const title = document.createElement('h3');
+        title.textContent = room.title || '';
+
+        const description = document.createElement('p');
+        description.textContent = room.description || '';
+
+        const price = document.createElement('div');
+        price.className = 'price';
+        price.textContent = room.price || '';
+
+        body.append(title, description, price);
+        roomElement.append(image, body);
+        container.appendChild(roomElement);
+      }
+    } catch (error) {
+      console.error('Ошибка загрузки номеров:', error);
     }
   }
 
