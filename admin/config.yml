@@ -2,7 +2,7 @@ backend:
   name: github
   repo: chimgandacha/qimiz
   branch: main
-site_id  '8a922642-80b0-4911-b7f4-ba5ba503bbf1'
+site_id:  '8a922642-80b0-4911-b7f4-ba5ba503bbf1'
 media_folder: "images"
 public_folder: "images"
 
