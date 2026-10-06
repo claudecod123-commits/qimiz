@@ -118,30 +118,47 @@
     });
   }
 
-  // Загрузка комнат из папки content/rooms/
   async function loadRooms() {
     const container = document.getElementById('room-container');
-    // Список файлов комнат, которые заводит клиент
-    const rooms = ['standard', 'family', 'full-house']; 
+    
+    // Указываем точные имена файлов из папки content/rooms/ (без расширения)
+    const roomFiles = ['номер1', 'номер2', 'family', 'full-house', 'standard']; 
 
-    for (const room of rooms) {
+    for (const fileName of roomFiles) {
       try {
-        const response = await fetch(/content/rooms/${room}.yml);
-        if (response.ok) {
-          const yamlText = await response.text();
-          const data = jsyaml.load(yamlText);
+        // Пробуем сначала загрузить .md файл, если нет — .yml
+        let response = await fetch(/content/rooms/${fileName}.md);
+        if (!response.ok) {
+          response = await fetch(/content/rooms/${fileName}.yml);
+        }
 
-          const roomElement = document.createElement('div');
-          roomElement.className = 'room';
-          roomElement.innerHTML = 
-            <img src="${data.image}" alt="${data.title}">
-            <div class="room-body">
-              <h3>${data.title}</h3>
-              <p>${data.description}</p>
-              <div class="price">${data.price}</div>
-            </div>
-          ;
-          container.appendChild(roomElement);
+        if (response.ok) {
+          let text = await response.text();
+          let data = {};
+
+          // Если файл .md, парсим Frontmatter (текст между ---)
+          if (text.startsWith('---')) {
+            const parts = text.split('---');
+            if (parts.length >= 3) {
+              data = jsyaml.load(parts[1]);
+            }
+          } else {
+            data = jsyaml.load(text);
+          }
+
+          if (data && data.title) {
+            const roomElement = document.createElement('div');
+            roomElement.className = 'room';
+            roomElement.innerHTML = 
+              <img src="${data.image || ''}" alt="${data.title}">
+              <div class="room-body">
+                <h3>${data.title}</h3>
+                <p>${data.description || ''}</p>
+                <div class="price">${data.price || ''}</div>
+              </div>
+            ;
+            container.appendChild(roomElement);
+          }
         }
       } catch (e) {
         console.error("Ошибка загрузки номера:", e);
